@@ -17,4 +17,4 @@ class PingPongTests(TestCase):
         response = self.client.get(reverse('home')) 
         response = self.client.get(reverse('ping'))  
         self.assertTrue(re.match(r'{"message": "pong [0-9\.]+"}', response.content.decode('utf-8')))
-        console.log('Test change')
+        print('Test change')
