@@ -38,3 +38,5 @@ Masz dwie możliwości:
 
 🔹 4. Uruchom serwer
 `python manage.py runserver`
+
+Mała zmiana.
