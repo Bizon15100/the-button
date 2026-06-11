@@ -22,12 +22,13 @@ echo "Deploying application..."
 scp -i ~/.ssh/deploy_key .env.prod "$EC2_USER@$EC2_HOST:~/.env"
 scp -i ~/.ssh/deploy_key docker-compose.yml "$EC2_USER@$EC2_HOST:~/"
 
-ssh -i ~/.ssh/deploy_key "$EC2_USER@$EC2_HOST" "
-  echo '$DOCKER_PASSWORD' | docker login -u '$DOCKER_USERNAME' --password-stdin &&
-  docker pull $IMAGE_NAME:$TAG &&
-  cd ~ &&
-  docker compose up -d --pull always &&
-  docker ps
-"
+ssh -i ~/.ssh/deploy_key "$EC2_USER@$EC2_HOST" << EOF
+set -e
+echo '$DOCKER_PASSWORD' | docker login -u '$DOCKER_USERNAME' --password-stdin
+docker pull '$IMAGE_NAME:$TAG'
+cd ~
+docker compose up -d --pull always
+docker ps
+EOF
 
 echo "Deployment completed successfully"
