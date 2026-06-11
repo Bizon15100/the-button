@@ -128,3 +128,43 @@ jobs:
 
       run: |
         .venv/bin/python manage.py test
+
+  deploy-to-dev:
+    needs: build-and-push
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Show environment variables
+      run: |
+        echo "Deploying to ${{ vars.ENVIRONMENT_NAME }} environment"
+        echo "Using token: ${{ secrets.DEPLOY_TOKEN != '' && '***' || 'Not set' }}"
+
+    - name: Mock deployment
+      run: |
+        echo "Starting deployment to development environment..."
+        sleep 5
+        echo "Deployment to development environment completed!"
+
+  deploy-to-production:
+    needs: deploy-to-dev
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Show environment variables
+      run: |
+        echo "Deploying to ${{ vars.ENVIRONMENT_NAME }} environment"
+        echo "Using token: ${{ secrets.DEPLOY_TOKEN != '' && '***' || 'Not set' }}"
+
+    - name: Mock deployment
+      run: |
+        echo "Starting deployment to production environment..."
+        sleep 10
+        echo "Deployment to production environment completed!"
