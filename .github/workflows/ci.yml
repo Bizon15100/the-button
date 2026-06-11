@@ -177,6 +177,8 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
           ENV_NAME: production
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           echo "Starting deployment to EC2..."
-          ./.github/scripts/deploy.sh $IMAGE_NAME $TAG $EC2_HOST $EC2_USER $ENV_NAME
+          ./.github/scripts/deploy.sh "$IMAGE_NAME" "$TAG" "$EC2_HOST" "$EC2_USER" "$ENV_NAME"
