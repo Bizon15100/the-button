@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [ master ]
   workflow_dispatch:
+    inputs:
+      version_type:
+        type: choice
+        description: "Select version type"
+        options:
+          - major
+          - minor
+          - patch
+        default: minor
 
 jobs:
   test:
