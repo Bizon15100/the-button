@@ -151,20 +151,32 @@ jobs:
 
   deploy-to-production:
     needs: deploy-to-dev
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     environment: production
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Show environment variables
-      run: |
-        echo "Deploying to ${{ vars.ENVIRONMENT_NAME }} environment"
-        echo "Using token: ${{ secrets.DEPLOY_TOKEN != '' && '***' || 'Not set' }}"
-
-    - name: Mock deployment
-      run: |
-        echo "Starting deployment to production environment..."
-        sleep 10
-        echo "Deployment to production environment completed!"
+      - name: Install SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          
+      - name: Adding Known Hosts
+        run: |
+          ssh-keyscan  ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          
+      - name: Prepare deployment
+        run: |
+          chmod +x  ./.github/scripts/deploy.sh
+          
+      - name: Deploy to EC2
+        env:
+          IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/the-button
+          TAG: latest
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          ENV_NAME: production
+        run: |
+          echo "Starting deployment to EC2..."
+          ./.github/scripts/deploy.sh $IMAGE_NAME $TAG $EC2_HOST $EC2_USER $ENV_NAME
