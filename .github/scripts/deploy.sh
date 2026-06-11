@@ -24,9 +24,11 @@ scp -i ~/.ssh/deploy_key docker-compose.yml "$EC2_USER@$EC2_HOST:~/"
 
 ssh -i ~/.ssh/deploy_key "$EC2_USER@$EC2_HOST" << EOF
 set -e
-echo '$DOCKER_PASSWORD' | docker login -u '$DOCKER_USERNAME' --password-stdin
-docker pull '$IMAGE_NAME:$TAG'
+echo "$DOCKER_PASSWORD" | docker login docker.io -u "$DOCKER_USERNAME" --password-stdin
+docker pull "$IMAGE_NAME:$TAG"
 cd ~
+docker compose down --remove-orphans || true
+docker rm -f the-button the_button_app 2>/dev/null || true
 docker compose up -d --pull always
 docker ps
 EOF
